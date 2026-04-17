@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Погода в Минске</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="{% if view and not view.now.is_day %}night{% else %}day{% endif %}">
+    <div class="container">
+        <header>
+            <h1>Минск</h1>
+            <p class="subtitle">Погода сейчас и прогноз на неделю</p>
+        </header>
+
+        {% if error %}
+            <div class="error">{{ error }}</div>
+        {% elif view %}
+            <section class="current">
+                <div class="current-main">
+                    <div class="icon icon-{{ view.now.icon }}"></div>
+                    <div class="current-temp">
+                        <span class="temp">{{ view.now.temperature }}°</span>
+                        <span class="desc">{{ view.now.description }}</span>
+                        <span class="feels">Ощущается как {{ view.now.feels_like }}°</span>
+                    </div>
+                </div>
+                <div class="current-stats">
+                    <div class="stat"><span class="stat-label">Ветер</span><span class="stat-value">{{ view.now.wind_speed }} м/с {{ view.now.wind_dir }}</span></div>
+                    <div class="stat"><span class="stat-label">Влажность</span><span class="stat-value">{{ view.now.humidity }}%</span></div>
+                    <div class="stat"><span class="stat-label">Давление</span><span class="stat-value">{{ view.now.pressure }} мм рт.ст.</span></div>
+                    <div class="stat"><span class="stat-label">Осадки</span><span class="stat-value">{{ view.now.precipitation }} мм</span></div>
+                    <div class="stat"><span class="stat-label">Восход</span><span class="stat-value">{{ view.sunrise }}</span></div>
+                    <div class="stat"><span class="stat-label">Закат</span><span class="stat-value">{{ view.sunset }}</span></div>
+                </div>
+                <p class="updated">Обновлено: {{ view.now.updated }}</p>
+            </section>
+
+            <section class="hourly">
+                <h2>По часам</h2>
+                <div class="hourly-scroll">
+                    {% for h in view.hours %}
+                    <div class="hour">
+                        <span class="h-time">{{ h.time }}</span>
+                        <span class="icon icon-{{ h.icon }} small"></span>
+                        <span class="h-temp">{{ h.temperature }}°</span>
+                        <span class="h-prec">{{ h.precipitation_probability }}%</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+
+            <section class="forecast">
+                <h2>Прогноз на 7 дней</h2>
+                <div class="days">
+                    {% for d in view.forecast %}
+                    <div class="day">
+                        <span class="d-weekday">{{ d.weekday }}</span>
+                        <span class="d-date">{{ d.date }}</span>
+                        <span class="icon icon-{{ d.icon }} small"></span>
+                        <span class="d-desc">{{ d.description }}</span>
+                        <span class="d-temp"><b>{{ d.t_max }}°</b> / <span class="min">{{ d.t_min }}°</span></span>
+                        <span class="d-prec">{{ d.precipitation }} мм</span>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        {% endif %}
+
+        <footer>
+            <p>Данные: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a></p>
+        </footer>
+    </div>
+</body>
+</html>
